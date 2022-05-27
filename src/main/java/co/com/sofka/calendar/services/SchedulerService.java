@@ -38,7 +38,7 @@ public class SchedulerService {
         return program
                 .flatMapMany(p -> Flux.fromStream(getDurationOf(p)))
                 .map(toProgramDate(startDate, endDate, pivot[0], index))
-                .switchIfEmpty(Mono.error(new RuntimeException("El programa academnico no existe")));
+                .switchIfEmpty(Mono.error(new RuntimeException("El programa academico no existe")));
     }
 
     //No tocar

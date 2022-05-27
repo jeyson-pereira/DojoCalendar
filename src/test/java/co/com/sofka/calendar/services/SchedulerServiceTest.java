@@ -13,7 +13,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -39,10 +42,14 @@ class SchedulerServiceTest {
 
         Mockito.when(repository.findById(programId)).thenReturn(Mono.just(program));
         //TODO: hacer una subscripción de el servicio reactivo
-        List<ProgramDate> response = schedulerService.generateCalendar(programId, startDate);
+        Flux<ProgramDate> response = schedulerService.generateCalendar(programId, startDate);
 
-        Assertions.assertEquals(13, response.size());//TODO: hacer de otro modo
-        Assertions.assertEquals(getSnapResult(), new Gson().toJson(response));//TODO: hacer de otro modo
+        StepVerifier.create(response)
+        .expectNextCount(13)
+        .expectComplete();
+
+        StepVerifier.create(Flux.just(getSnapResult())).expectNext(new Gson().toJson(response)).expectComplete();
+
         Mockito.verify(repository).findById(programId);
     }
 
@@ -53,12 +60,16 @@ class SchedulerServiceTest {
 
         Mockito.when(repository.findById(programId)).thenReturn(Mono.empty());
 
-        //TODO: hacer de otro modo
+        /* //TODO: hacer de otro modo
         var exception = Assertions.assertThrows(RuntimeException.class, () -> {
             schedulerService.generateCalendar(programId, startDate);//TODO: hacer una subscripción de el servicio reactivo
 
-        });
-        Assertions.assertEquals("El programa academnico no existe", exception.getMessage());//TODO: hacer de otro modo
+        }); */
+        //Assertions.assertEquals("El programa academnico no existe", exception.getMessage());//TODO: hacer de otro modo
+
+        StepVerifier.create(schedulerService.generateCalendar(programId, startDate))
+        .expectErrorMessage("El programa academico no existe")
+        .verify();
         Mockito.verify(repository).findById(programId);
 
     }
