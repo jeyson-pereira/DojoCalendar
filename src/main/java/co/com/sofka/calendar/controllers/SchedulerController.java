@@ -17,6 +17,13 @@ public class SchedulerController {
 
     @Autowired SchedulerService schedulerService;
 
+    /**
+     * "Generate a calendar for a program, starting from a given date."
+     *
+     * The function is called from a web page, and the user can select the program and the start date
+     *
+     * @return A Flux of ProgramDate objects.
+     */
     @GetMapping("/calendar")
     public Flux<ProgramDate> generateCalendar() {
         String programId = "xxxx";

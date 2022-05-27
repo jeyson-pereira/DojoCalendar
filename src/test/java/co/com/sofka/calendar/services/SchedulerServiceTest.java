@@ -6,7 +6,7 @@ import co.com.sofka.calendar.collections.Time;
 import co.com.sofka.calendar.model.ProgramDate;
 import co.com.sofka.calendar.repositories.ProgramRepository;
 import com.google.gson.Gson;
-import org.junit.jupiter.api.Assertions;
+//import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -44,10 +44,12 @@ class SchedulerServiceTest {
         //TODO: hacer una subscripción de el servicio reactivo
         Flux<ProgramDate> response = schedulerService.generateCalendar(programId, startDate);
 
+        // Verifying that the response has 13 elements and that it is completed.
         StepVerifier.create(response)
         .expectNextCount(13)
         .expectComplete();
 
+        // Comparing the result of the service with the expected result.
         StepVerifier.create(Flux.just(getSnapResult())).expectNext(new Gson().toJson(response)).expectComplete();
 
         Mockito.verify(repository).findById(programId);
@@ -67,6 +69,7 @@ class SchedulerServiceTest {
         }); */
         //Assertions.assertEquals("El programa academnico no existe", exception.getMessage());//TODO: hacer de otro modo
 
+        // A test for the case when the program is not found.
         StepVerifier.create(schedulerService.generateCalendar(programId, startDate))
         .expectErrorMessage("El programa academico no existe")
         .verify();
